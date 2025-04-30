@@ -1,68 +1,46 @@
-const API_URL = "https://www.googleapis.com/books/v1/volumes?q=YOUR_QUERY&key=AIzaSyCL0MN49y_P_4_avMw2ueRDsByUrfGPQSc";
-// Removed the extra quotes around the key
-// DOM Elements
-const searchInput = document.getElementById('search-input');
-const searchBtn = document.getElementById('search-btn');
-const resultsContainer = document.getElementById('results-container');
-const savedContainer = document.getElementById('saved-container');
+// Use environment variables in production (see notes below)
+const API_KEY = "AIzaSyCL0MN49y_P_4_avMw2ueRDsByUrfGPQSc"; // 🔥 Replace with your key (and restrict it!)
 
-// Fetch books from API
 async function fetchBooks(query) {
-    try {
-        const response = await fetch(`${API_URL}${query}`);
-        const data = await response.json();
-        displayResults(data.items);
-    } catch (error) {
-        console.error("Error fetching books:", error);
-    }
+  const API_URL = `https://www.googleapis.com/books/v1/volumes?q=${query}&key=${API_KEY}`;
+  
+  try {
+    const response = await fetch(API_URL);
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+    const data = await response.json();
+    displayResults(data.items || []);
+  } catch (error) {
+    console.error("Fetch failed:", error);
+    document.getElementById("results-container").innerHTML = 
+      `<p class="error">⚠️ Failed to load books. ${error.message}</p>`;
+  }
 }
 
-// Display results
 function displayResults(books) {
-    resultsContainer.innerHTML = '';
-    
-    books.forEach(book => {
-        const { title, authors, description, imageLinks } = book.volumeInfo;
-        
-        const bookCard = document.createElement('div');
-        bookCard.className = 'book-card';
-        bookCard.innerHTML = `
-            <h3>${title}</h3>
-            ${authors ? `<p>By: ${authors.join(', ')}</p>` : ''}
-            ${imageLinks ? `<img src="${imageLinks.thumbnail}" alt="${title}">` : ''}
-            <p>${description ? description.substring(0, 100) + '...' : 'No description available'}</p>
-            <button onclick="saveBook('${book.id}')">Save to Reading List</button>
-        `;
-        resultsContainer.appendChild(bookCard);
-    });
-}
-
-// Save book to localStorage
-function saveBook(bookId) {
-    let savedBooks = JSON.parse(localStorage.getItem('savedBooks')) || [];
-    if (!savedBooks.includes(bookId)) {
-        savedBooks.push(bookId);
-        localStorage.setItem('savedBooks', JSON.stringify(savedBooks));
-        displaySavedBooks();
-    }
-}
-
-// Display saved books
-function displaySavedBooks() {
-    const savedBooks = JSON.parse(localStorage.getItem('savedBooks')) || [];
-    savedContainer.innerHTML = savedBooks.length ? '' : '<p>No books saved yet.</p>';
-    
-    savedBooks.forEach(bookId => {
-        // In a real app, you'd fetch book details again or store them
-        savedContainer.innerHTML += `<div class="saved-book">Book ID: ${bookId}</div>`;
-    });
+  const container = document.getElementById("results-container");
+  container.innerHTML = books.length === 0
+    ? `<p>No books found. Try "Harry Potter" or "JavaScript".</p>`
+    : books.map(book => `
+        <div class="book-card">
+          <h3>${book.volumeInfo?.title || "Untitled"}</h3>
+          ${book.volumeInfo?.authors ? `<p>By: ${book.volumeInfo.authors.join(", ")}</p>` : ""}
+          ${book.volumeInfo?.imageLinks?.thumbnail 
+            ? `<img src="${book.volumeInfo.imageLinks.thumbnail}" alt="Cover">` 
+            : `<div class="no-cover">No cover</div>`}
+          <a href="${book.volumeInfo?.infoLink || "#"}" target="_blank">More info</a>
+        </div>
+      `).join("");
 }
 
 // Event listeners
-searchBtn.addEventListener('click', () => {
-    const query = searchInput.value.trim();
-    if (query) fetchBooks(query);
+document.getElementById("search-btn").addEventListener("click", () => {
+  const query = document.getElementById("search-input").value.trim();
+  if (query) fetchBooks(query);
 });
 
-// Initialize
-displaySavedBooks();
+document.getElementById("search-input").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    const query = e.target.value.trim();
+    if (query) fetchBooks(query);
+  }
+});
