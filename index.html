@@ -3,22 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Finder</title>
+    <title>BookFinder | Discover Your Next Read</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>📖 Book Finder</h1>
-        <div class="search-box">
-            <input type="text" id="search-input" placeholder="Search by title/author...">
-            <button id="search-btn">Search</button>
-        </div>
-        <div id="results-container"></div>
-        <div class="saved-books">
-            <h2>📚 My Reading List</h2>
-            <div id="saved-container"></div>
-        </div>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1><i class="fas fa-book-open"></i> BookFinder</h1>
+                <p class="tagline">Discover your next literary adventure</p>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="search-section">
+                <div class="search-container">
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="Search for books, authors..." aria-label="Book search">
+                        <button id="search-btn" class="search-button">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    <div class="search-hints">
+                        <span>Try: "Harry Potter", "Stephen King", or "Machine Learning"</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="results-section">
+                <div id="results-container" class="book-grid"></div>
+                <div id="loading-spinner" class="spinner hidden">
+                    <div class="spinner-circle"></div>
+                </div>
+            </section>
+
+            <section class="saved-section">
+                <h2><i class="fas fa-bookmark"></i> My Reading List</h2>
+                <div id="saved-container" class="book-grid"></div>
+                <div id="empty-saved" class="empty-state">
+                    <i class="fas fa-book"></i>
+                    <p>Your saved books will appear here</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>Made with <i class="fas fa-heart"></i> by Nikhithaa</p>
+        </footer>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
